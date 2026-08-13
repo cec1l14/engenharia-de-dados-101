@@ -106,6 +106,28 @@ def ler_produtos_txt() -> list[dict]:
     .split("|") para separar os campos.
     """
     # TODO: implemente a leitura do arquivo lakehouse/landing/produtos.txt
+
+    caminho_txt = LANDING / "produtos.txt"
+    dicionario = []
+    cabecalho = None
+
+    with open(caminho_txt, 'r', encoding='utf-8') as arquivo:
+        for linha in arquivo:
+            linha = linha.strip()
+
+            if not linha or linha.startswith('#'):
+                continue
+
+            if cabecalho is None:
+                cabecalho = linha.strip('|')
+                continue
+
+            valores = linha.split('|')
+            registro = dict(zip(cabecalho, valores))
+            dicionario.append(registro)
+
+        return dicionario
+    
     raise NotImplementedError("Implemente ler_produtos_txt()")
 
 
