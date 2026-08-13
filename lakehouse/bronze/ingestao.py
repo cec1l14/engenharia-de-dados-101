@@ -55,8 +55,14 @@ def ler_vendas_csv() -> list[dict]:
     Dica: use csv.DictReader.
     """
     # TODO: implemente a leitura do arquivo lakehouse/landing/vendas.csv
-    raise NotImplementedError("Implemente ler_vendas_csv()")
 
+    caminho_csv = LANDING / "vendas.csv"
+
+    with open(caminho_csv, 'r', encoding='utf-8') as arquivo:
+        leitor = csv.DictReader(arquivo)
+        lista = list(leitor)
+
+        return lista
 
 def ler_clientes_json() -> list[dict]:
     """
@@ -69,6 +75,14 @@ def ler_clientes_json() -> list[dict]:
     chaves -- isso é esperado na bronze.
     """
     # TODO: implemente a leitura do arquivo lakehouse/landing/clientes.json
+
+    caminho_json = LANDING / "clientes.json"
+
+    with open(caminho_json, 'r', encoding='utf-8') as arquivo:
+        dados = json.load(arquivo)
+
+        return dados
+
     raise NotImplementedError("Implemente ler_clientes_json()")
 
 
