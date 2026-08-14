@@ -87,26 +87,6 @@ def ler_clientes_json() -> list[dict]:
 
 
 def ler_produtos_txt() -> list[dict]:
-    """
-    Lê lakehouse/landing/produtos.txt, um arquivo texto delimitado por "|", e
-    devolve uma lista de dicionários com as chaves:
-        id_produto, nome, categoria, preco, ativo
-
-    Regras de leitura (isso IS parte da ingestão bronze, pois é sobre
-    "como ler o formato", não sobre "corrigir o conteúdo"):
-      - Linhas que começam com "#" são comentários -> ignore.
-      - Linhas em branco -> ignore.
-      - A primeira linha "de verdade" (não comentário, não em branco) é o
-        cabeçalho: "id_produto|nome|categoria|preco|ativo" -> use-a para
-        nomear as colunas, não a inclua como dado.
-      - Todas as demais linhas são dados: separe por "|" e monte o dicionário.
-
-    Dica: abra o arquivo, itere linha a linha com .readlines() ou iterando
-    o próprio arquivo, use .strip() para remover a quebra de linha e
-    .split("|") para separar os campos.
-    """
-    # TODO: implemente a leitura do arquivo lakehouse/landing/produtos.txt
-
     caminho_txt = LANDING / "produtos.txt"
     dicionario = []
     cabecalho = None
@@ -119,7 +99,7 @@ def ler_produtos_txt() -> list[dict]:
                 continue
 
             if cabecalho is None:
-                cabecalho = linha.strip('|')
+                cabecalho = linha.split('|')
                 continue
 
             valores = linha.split('|')
@@ -127,8 +107,6 @@ def ler_produtos_txt() -> list[dict]:
             dicionario.append(registro)
 
         return dicionario
-    
-    raise NotImplementedError("Implemente ler_produtos_txt()")
 
 
 def adicionar_metadados(registros: list[dict], nome_arquivo: str) -> list[dict]:

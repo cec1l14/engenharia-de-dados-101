@@ -144,6 +144,7 @@ def limpar_produtos(bronze: list[dict]) -> list[dict]:
     # TODO: implemente a limpeza de produtos
 
     produtos = {}
+    categorias_min = {c.lower(): c for c in CATEGORIAS_VALIDAS}
 
     categorias_min = {}
     for i in CATEGORIAS_VALIDAS:
@@ -151,8 +152,14 @@ def limpar_produtos(bronze: list[dict]) -> list[dict]:
 
     for i in bronze:
         
-        if i["id_produto"].strip() == "":
-          continue
+        if not i.get("id_produto") or i["id_produto"].strip() == "":
+              continue
+
+        cat_limpa = i.get("categoria", "").strip().lower()
+        if cat_limpa not in categorias_min:
+            continue
+          
+        i["categoria"] = categorias_min[cat_limpa]
 
         i["id_produto"] = int(i["id_produto"])
 
