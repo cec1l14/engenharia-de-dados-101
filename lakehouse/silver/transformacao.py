@@ -151,6 +151,9 @@ def limpar_produtos(bronze: list[dict]) -> list[dict]:
 
     for i in bronze:
         
+        if i["id_produto"].strip() == "":
+          continue
+
         i["id_produto"] = int(i["id_produto"])
 
         i["preco"] = i["preco"].replace(',', '.')
@@ -196,7 +199,45 @@ def limpar_vendas(bronze: list[dict], ids_clientes_validos: set[int], ids_produt
     """
     # TODO: implemente a limpeza de vendas
 
-    
+    vendas = {}
+
+    for i in bronze:
+
+        i["id_venda"] = int(i["id_venda"])
+        i["id_cliente"] = int(i["id_cliente"])
+        i["id_produto"] = int(i["id_produto"])
+
+
+        i["data_venda"] = i["data_venda"].strip()
+        if '/' in i["data_venda"]:
+            dia, mes, ano = i["data_venda"].split('/')
+            i["data_venda"] = f"{ano}-{mes}-{dia}"
+
+        if i["quantidade"].strip() == "":
+            continue
+        
+        i["quantidade"] = int(i["quantidade"])
+
+        if i["quantidade"] <= 0:
+            continue
+
+        if i["valor_total"].strip() == "":
+            continue
+        else:
+            i["valor_total"] = i["valor_total"].replace(',', '.')
+            i["valor_total"] = float(i["valor_total"])
+
+        if i["id_cliente"] not in ids_clientes_validos:
+          continue
+
+        if i["id_produto"] not in ids_produtos_validos:
+          continue
+
+        if i["id_venda"] not in vendas:
+          vendas[i["id_venda"]] = i
+
+    return list(vendas.values())
+
     raise NotImplementedError("Implemente limpar_vendas()")
 
 
