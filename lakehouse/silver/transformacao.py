@@ -83,16 +83,93 @@ def limpar_clientes(bronze: list[dict]) -> list[dict]:
     """
     Aplica as regras de limpeza de clientes descritas no topo do arquivo.
     Retorna a lista final (sem duplicatas, sem e-mails inválidos).
+
+      clientes:
+    - id_cliente vira inteiro.
+    - email: tira espaços, deixa em minúsculo. Se não tiver "@", o
+      registro é DESCARTADO (e-mail impossível de corrigir).
+    - estado: tira espaços, deixa em MAIÚSCULO (sigla de 2 letras).
+    - Se houver id_cliente duplicado, mantenha o ÚLTIMO registro que
+      aparece no arquivo (é o mais recente).
+
     """
     # TODO: implemente a limpeza de clientes
+
+    clientes = {}
+
+    for i in bronze:
+        
+        i["id_cliente"] = int(i["id_cliente"])
+
+        i["email"] = i["email"].strip().lower()
+
+        if '@' not in i["email"]:
+            continue
+
+        i["estado"] = i["estado"].strip().upper()
+
+        registro = {
+            
+            "id_cliente": i["id_cliente"],
+            "nome": i["nome"],
+            "email": i["email"],
+            "cidade": i["cidade"],
+            "estado": i["estado"],
+            "data_cadastro": i["data_cadastro"],
+        }
+
+        clientes[i["id_cliente"]] = registro
+
+    return list(clientes.values())
+          
     raise NotImplementedError("Implemente limpar_clientes()")
 
 
 def limpar_produtos(bronze: list[dict]) -> list[dict]:
     """
     Aplica as regras de limpeza de produtos descritas no topo do arquivo.
+
+      produtos:
+    - id_produto vira inteiro, preco vira float (troque "," por "." antes
+      de converter).
+    - categoria: tire espaços e padronize a capitalização para bater
+      EXATAMENTE com uma das categorias válidas (veja CATEGORIAS_VALIDAS
+      no README). Dica: comparar em minúsculas e depois usar um
+      dicionário de "categoria em minúsculo -> categoria oficial".
+    - ativo: "sim" -> 1, "nao"/"não" -> 1 é ERRADO, "nao"/"não" -> 0,
+      "1" -> 1, "0" -> 0, vazio -> 0 (trate como inativo).
+    - Se houver id_produto duplicado, mantenha a PRIMEIRA ocorrência.
+
     """
     # TODO: implemente a limpeza de produtos
+
+    produtos = {}
+
+    categorias_min = {}
+    for i in CATEGORIAS_VALIDAS:
+        categorias_min[i.lower()] = i
+
+    for i in bronze:
+        
+        i["id_produto"] = int(i["id_produto"])
+
+        i["preco"] = i["preco"].replace(',', '.')
+        i["preco"] = float(i["preco"])
+
+        i["categoria"] = i["categoria"].strip().lower()
+
+        i["categoria"] = categorias_min[i["categoria"].strip().lower()]
+
+        if str(i["ativo"]).lower().strip() == "sim":
+            i["ativo"] = 1
+        else:
+            i["ativo"] = 0
+
+        if i["id_produto"] not in produtos:
+            produtos[i["id_produto"]] = i
+            
+    return list(produtos.values())
+           
     raise NotImplementedError("Implemente limpar_produtos()")
 
 
@@ -101,8 +178,25 @@ def limpar_vendas(bronze: list[dict], ids_clientes_validos: set[int], ids_produt
     Aplica as regras de limpeza de vendas descritas no topo do arquivo,
     incluindo o filtro de integridade referencial contra clientes/produtos
     já limpos.
+
+      vendas:
+    - id_venda, id_cliente, id_produto viram inteiros.
+    - data_venda: pode vir como "AAAA-MM-DD" ou "DD/MM/AAAA" (às vezes com
+      espaços em volta) -> padronize sempre para "AAAA-MM-DD".
+    - quantidade: vira inteiro. Linhas com quantidade vazia, zero ou
+      negativa são DESCARTADAS (não fazem sentido no negócio).
+    - valor_total: vira float (troque "," por "."). Linhas com valor
+      vazio são DESCARTADAS.
+    - Linhas EXATAMENTE duplicadas (mesmo id_venda repetido) -> mantenha
+      só uma ocorrência.
+    - Linhas cujo id_cliente ou id_produto não existe mais em
+      clientes_silver / produtos_silver (porque foi descartado, ou porque
+      nunca existiu -- ex.: id_cliente 9999) -> DESCARTADAS.
+
     """
     # TODO: implemente a limpeza de vendas
+
+    
     raise NotImplementedError("Implemente limpar_vendas()")
 
 
